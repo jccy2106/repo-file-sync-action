@@ -33,10 +33,10 @@ async function run() {
 
 	await forEach(repos, async (item) => {
 		core.info(`Repository Info`)
-		core.info(`Slug		: ${ item.repo.name }`)
-		core.info(`Owner		: ${ item.repo.user }`)
-		core.info(`Https Url	: https://${ item.repo.fullName }`)
-		core.info(`Branch		: ${ item.repo.branch }`)
+		core.info(`Slug		: ${item.repo.name}`)
+		core.info(`Owner		: ${item.repo.user}`)
+		core.info(`Https Url	: https://${item.repo.fullName}`)
+		core.info(`Branch		: ${item.repo.branch}`)
 		core.info('	')
 		try {
 
@@ -50,7 +50,7 @@ async function run() {
 				// Check for existing PR and add warning message that the PR maybe about to change
 				existingPr = OVERWRITE_EXISTING_PR ? await git.findExistingPr() : undefined
 				if (existingPr && DRY_RUN === false) {
-					core.info(`Found existing PR ${ existingPr.number }`)
+					core.info(`Found existing PR ${existingPr.number}`)
 					await git.setPrWarning()
 				}
 			}
@@ -61,16 +61,16 @@ async function run() {
 			// Loop through all selected files of the source repo
 			await forEach(item.files, async (file) => {
 				const fileExists = fs.existsSync(file.source)
-				if (fileExists === false) return core.warning(`Source ${ file.source } not found`)
+				if (fileExists === false) return core.warning(`Source ${file.source} not found`)
 
-				const localDestination = `${ git.workingDir }/${ file.dest }`
+				const localDestination = `${git.workingDir}/${file.dest}`
 
 				const destExists = fs.existsSync(localDestination)
 				if (destExists === true && file.replace === false) return core.warning(`File(s) already exist(s) in destination and 'replace' option is set to false`)
 
 				const isDirectory = await pathIsDirectory(file.source)
-				const source = isDirectory ? `${ addTrailingSlash(file.source) }` : file.source
-				const dest = isDirectory ? `${ addTrailingSlash(localDestination) }` : localDestination
+				const source = file.source //isDirectory ? `${ addTrailingSlash(file.source) }` : file.source
+				const dest = localDestination //isDirectory ? `${ addTrailingSlash(localDestination) }` : localDestination
 
 				if (isDirectory) core.info(`Source is directory`)
 
@@ -84,7 +84,7 @@ async function run() {
 
 					if (hasChanges === false) return core.debug('File(s) already up to date')
 
-					core.debug(`Creating commit for file(s) ${ file.dest }`)
+					core.debug(`Creating commit for file(s) ${file.dest}`)
 
 					// Use different commit/pr message based on if the source is a directory or file
 					const directory = isDirectory ? 'directory' : ''
@@ -93,12 +93,12 @@ async function run() {
 
 					const message = {
 						true: {
-							commit: useOriginalCommitMessage ? git.originalCommitMessage() : `${ COMMIT_PREFIX } synced local '${ file.dest }' with remote '${ file.source }'`,
-							pr: `synced local ${ directory } <code>${ file.dest }</code> with remote ${ directory } <code>${ file.source }</code>`
+							commit: useOriginalCommitMessage ? git.originalCommitMessage() : `${COMMIT_PREFIX} synced local '${file.dest}' with remote '${file.source}'`,
+							pr: `synced local ${directory} <code>${file.dest}</code> with remote ${directory} <code>${file.source}</code>`
 						},
 						false: {
-							commit: useOriginalCommitMessage ? git.originalCommitMessage() : `${ COMMIT_PREFIX } created local '${ file.dest }' from remote '${ file.source }'`,
-							pr: `created local ${ directory } <code>${ file.dest }</code> ${ otherFiles } from remote ${ directory } <code>${ file.source }</code>`
+							commit: useOriginalCommitMessage ? git.originalCommitMessage() : `${COMMIT_PREFIX} created local '${file.dest}' from remote '${file.source}'`,
+							pr: `created local ${directory} <code>${file.dest}</code> ${otherFiles} from remote ${directory} <code>${file.source}</code>`
 						}
 					}
 
@@ -163,7 +163,7 @@ async function run() {
 					<details>
 					<summary>Changed files</summary>
 					<ul>
-					${ modified.map((file) => `<li>${ file.message }</li>`).join('') }
+					${modified.map((file) => `<li>${file.message}</li>`).join('')}
 					</ul>
 					</details>
 				`)
@@ -171,26 +171,26 @@ async function run() {
 				const useCommitAsPRTitle = COMMIT_AS_PR_TITLE && modified.length === 1 && modified[0].useOriginalMessage
 				const pullRequest = await git.createOrUpdatePr(COMMIT_EACH_FILE ? changedFiles : '', useCommitAsPRTitle ? modified[0].commitMessage.split('\n', 1)[0].trim() : undefined)
 
-				core.notice(`Pull Request #${ pullRequest.number } created/updated: ${ pullRequest.html_url }`)
+				core.notice(`Pull Request #${pullRequest.number} created/updated: ${pullRequest.html_url}`)
 				prUrls.push(pullRequest.html_url)
 
 				if (PR_LABELS !== undefined && PR_LABELS.length > 0 && !FORK) {
-					core.info(`Adding label(s) "${ PR_LABELS.join(', ') }" to PR`)
+					core.info(`Adding label(s) "${PR_LABELS.join(', ')}" to PR`)
 					await git.addPrLabels(PR_LABELS)
 				}
 
 				if (ASSIGNEES !== undefined && ASSIGNEES.length > 0 && !FORK) {
-					core.info(`Adding assignee(s) "${ ASSIGNEES.join(', ') }" to PR`)
+					core.info(`Adding assignee(s) "${ASSIGNEES.join(', ')}" to PR`)
 					await git.addPrAssignees(ASSIGNEES)
 				}
 
 				if (REVIEWERS !== undefined && REVIEWERS.length > 0 && !FORK) {
-					core.info(`Adding reviewer(s) "${ REVIEWERS.join(', ') }" to PR`)
+					core.info(`Adding reviewer(s) "${REVIEWERS.join(', ')}" to PR`)
 					await git.addPrReviewers(REVIEWERS)
 				}
 
 				if (TEAM_REVIEWERS !== undefined && TEAM_REVIEWERS.length > 0 && !FORK) {
-					core.info(`Adding team reviewer(s) "${ TEAM_REVIEWERS.join(', ') }" to PR`)
+					core.info(`Adding team reviewer(s) "${TEAM_REVIEWERS.join(', ')}" to PR`)
 					await git.addPrTeamReviewers(TEAM_REVIEWERS)
 				}
 			}
