@@ -18,7 +18,7 @@ export async function forEach(array, callback) {
 // From https://github.com/MartinKolarik/dedent-js/blob/master/src/index.ts - MIT © 2015 Martin Kolárik
 export function dedent(templateStrings, ...values) {
 	const matches = []
-	const strings = typeof templateStrings === 'string' ? [ templateStrings ] : templateStrings.slice()
+	const strings = typeof templateStrings === 'string' ? [templateStrings] : templateStrings.slice()
 	strings[strings.length - 1] = strings[strings.length - 1].replace(/\r?\n([\t ]*)$/, '')
 	for (let i = 0; i < strings.length; i++) {
 		let match
@@ -29,7 +29,7 @@ export function dedent(templateStrings, ...values) {
 	}
 	if (matches.length) {
 		const size = Math.min(...matches.map((value) => value.length - 1))
-		const pattern = new RegExp(`\n[\t ]{${ size }}`, 'g')
+		const pattern = new RegExp(`\n[\t ]{${size}}`, 'g')
 		for (let i = 0; i < strings.length; i++) {
 			strings[i] = strings[i].replace(pattern, '\n')
 		}
@@ -43,7 +43,7 @@ export function dedent(templateStrings, ...values) {
 }
 
 export function execCmd(command, workingDir, trimResult = true) {
-	core.debug(`EXEC: "${ command }" IN ${ workingDir }`)
+	core.debug(`EXEC: "${command}" IN ${workingDir}`)
 	return new Promise((resolve, reject) => {
 		exec(
 			command,
@@ -51,7 +51,7 @@ export function execCmd(command, workingDir, trimResult = true) {
 				cwd: workingDir,
 				maxBuffer: 1024 * 1024 * 4
 			},
-			function(error, stdout) {
+			function (error, stdout) {
 				error ? reject(error) : resolve(
 					trimResult ? stdout.trim() : stdout
 				)
@@ -97,14 +97,14 @@ export async function copy(src, dest, isDirectory, file) {
 			}
 
 			if (exclude.includes(filePath)) {
-				core.debug(`Excluding file ${ file } since its path is included as one of the excluded paths.`)
+				core.debug(`Excluding file ${file} since its path is included as one of the excluded paths.`)
 				return false
 			}
 
 
 			// Or if the file itself is in the excluded files
 			if (exclude.includes(file)) {
-				core.debug(`Excluding file ${ file } since it is explicitly added in the exclusion list.`)
+				core.debug(`Excluding file ${file} since it is explicitly added in the exclusion list.`)
 				return false
 			}
 		}
@@ -113,7 +113,7 @@ export async function copy(src, dest, isDirectory, file) {
 
 	if (file.template) {
 		if (isDirectory) {
-			core.debug(`Render all files in directory ${ src } to ${ dest }`)
+			core.debug(`Render all files in directory ${src} to ${dest}`)
 
 			const srcFileList = await readfiles(src, { readContents: false, hidden: true })
 			for (const srcFile of srcFileList) {
@@ -124,12 +124,12 @@ export async function copy(src, dest, isDirectory, file) {
 				await write(srcPath, destPath, file.template)
 			}
 		} else {
-			core.debug(`Render file ${ src } to ${ dest }`)
+			core.debug(`Render file ${src} to ${dest}`)
 
 			await write(src, dest, file.template)
 		}
 	} else {
-		core.debug(`Copy ${ src } to ${ dest }`)
+		core.debug(`Copy ${src} to ${dest}...`)
 		await fs.copy(src, dest, file.exclude !== undefined && { filter: filterFunc })
 	}
 
@@ -144,12 +144,12 @@ export async function copy(src, dest, isDirectory, file) {
 			if (destFile.startsWith('.git')) return
 			if (srcFileList.indexOf(destFile) === -1) {
 				const filePath = path.join(dest, destFile)
-				core.debug(`Found an orphaned file in the target repo - ${ filePath }`)
+				core.debug(`Found an orphaned file in the target repo - ${filePath}`)
 
 				if (file.exclude !== undefined && file.exclude.includes(path.join(src, destFile))) {
-					core.debug(`Excluding file ${ destFile }`)
+					core.debug(`Excluding file ${destFile}`)
 				} else {
-					core.debug(`Removing file ${ destFile }`)
+					core.debug(`Removing file ${destFile}`)
 					await fs.remove(filePath)
 				}
 			}
@@ -159,7 +159,7 @@ export async function copy(src, dest, isDirectory, file) {
 
 export async function remove(src) {
 
-	core.debug(`RM: ${ src }`)
+	core.debug(`RM: ${src}`)
 
 	return fs.remove(src)
 }
