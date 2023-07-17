@@ -24,6 +24,7 @@ const {
 } = config
 
 async function run() {
+	core.debug('HELLO HI HEY BYE')
 	// Reuse octokit for each repo
 	const git = new Git()
 
